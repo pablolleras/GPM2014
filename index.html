@@ -1,0 +1,952 @@
+<?php 
+    session_start();
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>GranPolla Mundial 2014</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <!-- Jquery UI Core CSS-->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon"/>
+
+    <!-- Fonts -->
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+
+    <!-- Custom Theme CSS -->
+    <link href="css/grayscale.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen"/>
+
+    <!-- Core JavaScript Files -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+
+    <!--disabling code in html doc to lower # of docs-->
+    <script type="text/javascript">
+        function checkDate(closeDate){
+            var currDate = new Date();
+
+            if( currDate >= closeDate ){
+                return true;
+            }
+            return false;
+        }
+
+        //due dates for submission
+        
+        var closeDateBono = new Date(Date.UTC(2014, 5, 11, 0, 0, 0));   
+        var closeDateR1F1 = new Date(Date.UTC(2014, 5, 11, 0, 0, 0));
+        var closeDateR1F2 = new Date(Date.UTC(2014, 5, 18, 0, 0, 0));
+        var closeDateR1F3 = new Date(Date.UTC(2014, 5, 23, 0, 0, 0));
+
+        //use $("input").prop('disabled', true); for each input in form and remove button...no need for bools
+        function validateDate(){
+            if(checkDate(closeDateBono)){
+                $("select.group").prop('disabled',true);                
+                $("#btnbono").hide();      
+            }
+            if(checkDate(closeDateR1F1)){                
+                var inpts1 = $("form.r1f1form :input");
+                inpts1.prop('disabled',true);
+                inpts1.prop('type','text');   
+                $("#btnr1f1").hide();    
+            }
+            if(checkDate(closeDateR1F2)){
+                var inpts2 = $("form.r1f2form :input");
+                inpts2.prop('disabled',true);
+                inpts2.prop('type','text'); 
+                $("#btnr1f2").hide();    
+            }
+            if(checkDate(closeDateR1F3)){
+                var inpts3 = $("form.r1f3form :input");
+                inpts3.prop('disabled',true);
+                inpts3.prop('type','text'); 
+                $("#btnr1f3").hide();    
+            }
+
+            setTimeout(validateDate,1800000);
+        };
+
+
+    </script>
+</head>
+<body id="page-top" data-spy="scroll" data-target=".navbar-custom">
+
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#page-top">
+                    <i class="fa fa-play-circle"></i>  <span class="light">Inicio</span> 
+                </a>
+            </div>
+
+            <?php
+                if($_SESSION['msg']['login-err'])
+                {
+                    echo '<script type="text/javascript">alert("Email o Password Incorrecto");</script>';
+                    unset($_SESSION['msg']['login-err']);
+                    // This will output login errors, if any
+                }
+            ?>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#about">Reglas</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#prizes">Premios</a>
+                    </li>
+                    <?php
+                        if ($_SESSION['UserId']):
+                    ?>
+                    <li class="page-scroll">
+                        <a href="#standings">Posiciones</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#download">Marcadores</a>
+                    </li>
+                    <?php
+                            endif;
+                    ?>
+                    <li class="page-scroll">
+                        <a href="#contact">Contactar</a>
+                    </li>
+                    <li>                        
+                        <?php
+                            if (!$_SESSION['UserId']):
+                        ?>
+                            <div class="divLogin">
+                                <form action="php/session.php" method ="post" class="loginForm">
+                                <input type="text" id="loginEmail" name="email" value="" placeholder="E-mail">   
+                                <input type="password" id="loginPass" name="password" value="" placeholder="Password">       
+                                </form>                          
+                            </div>
+                        <?php
+                        else:
+                        // If you are logged in
+                        ?>
+                            <div class="divLogin" style="margin-left: 15em;display:flex;">
+                                <div class="namePlate"><?php echo $_SESSION["Name"]; ?></div>
+                                <a href="php/logout.php">Salir</a>
+                            </div>
+                        <?php
+                            endif;
+                        ?>
+                    </li>
+                    <?php
+                        if (!$_SESSION['UserId']):
+                    ?>
+                        <li>
+                             <div type="text" name="Login" class="btnUsername" onclick="login()">Ingresar</div> 
+                        </li>
+                        <li>
+                            <a id="dialog_trigger" href="javascript:void(0)" onclick="signup()">Crear Cuenta</a>
+                        </li>
+                    <?php
+                        endif;
+                    ?>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <section class="intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h1 class="brand-heading">GranPolla Mundial 2014</h1>
+                        <p class="intro-text">Saquese La Polla y Hagase Rico!.</p>
+                        <div class="page-scroll">
+                            <a href="#about" class="btn btn-circle">
+                                <i class="fa fa-angle-double-down animated"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="container content-section text-center">
+        <div class="row" id="rules-section">
+            <div class="col-lg-8 col-lg-offset-2" id="rulesDiv">
+                <iframe src="img/Inscripciones.pdf" class="pdfFrame">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <section id="prizes" class="container content-section text-center">
+        <div class="row" id="prizes-section">
+            <div class="col-lg-8 col-lg-offset-2" id="prizesDiv">
+                <iframe src="img/Prizes.pdf" class="pdfFrame">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+<?php
+    if ($_SESSION['UserId']):
+?>
+
+    <section id="standings" class="container content-section text-center">
+        <div class="row" id="standings-section">
+            <div class="col-lg-8 col-lg-offset-2" id="standingsDiv">
+                <iframe src="img/Standings.pdf" class="pdfFrame">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="content-section text-center">
+        <div class="download-section">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+
+                <!--TABS-->
+               
+                <div id="content">
+                    <div id="wrapper">
+                        <div id="steps">                            
+                            <form id="formElem" name="bonoform" class="bonoform" action="php/savebonus.php" method="post">
+                                <fieldset class="step">
+                                    <div class="scrollDiv" style="overflow-y:auto;overflow-x:hidden;height:400px;">
+                                    <legend>Bono  (Cierra: Junio 10, 8pm ET)</legend>
+                                    <p class="placeLabel">
+                                        <label for="A">1er</label>
+                                        <label for="A">2do</label>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="A">Grupo A</label>
+                                        <select id="A"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][A][]">
+                                          <option value="Bra" <?php if($_SESSION['A1'] =="Bra") echo 'selected'; ?>>BRASIL</option>
+                                          <option value="Cro" <?php if($_SESSION['A1'] =="Cro") echo 'selected'; ?>>CROACIA</option>
+                                          <option value="Mex" <?php if($_SESSION['A1'] =="Mex") echo 'selected'; ?>>MEXICO</option>
+                                          <option value="Cmr" <?php if($_SESSION['A1'] =="Cmr") echo 'selected'; ?>>CAMEROON</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][A][]">
+                                          <option value="Bra" <?php if($_SESSION['A2'] =="Bra") echo 'selected'; ?>>BRASIL</option>
+                                          <option value="Cro" <?php if($_SESSION['A2'] =="Cro") echo 'selected'; ?>>CROACIA</option>
+                                          <option value="Mex" <?php if($_SESSION['A2'] =="Mex") echo 'selected'; ?>>MEXICO</option>
+                                          <option value="Cmr" <?php if($_SESSION['A2'] =="Cmr") echo 'selected'; ?>>CAMEROON</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="B">Grupo B</label>
+                                        <select id="B"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][B][]">
+                                          <option value="Esp" <?php if($_SESSION['B1'] =="Esp") echo 'selected'; ?>>ESPAÑA</option>
+                                          <option value="Hol" <?php if($_SESSION['B1'] =="Hol") echo 'selected'; ?>>HOLANDA</option>
+                                          <option value="Chi" <?php if($_SESSION['B1'] =="Chi") echo 'selected'; ?>>CHILE</option>
+                                          <option value="Aus" <?php if($_SESSION['B1'] =="Aus") echo 'selected'; ?>>AUSTRALIA</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][B][]">
+                                          <option value="Esp" <?php if($_SESSION['A2'] =="Esp") echo 'selected'; ?>>ESPAÑA</option>
+                                          <option value="Hol" <?php if($_SESSION['B2'] =="Hol") echo 'selected'; ?>>HOLANDA</option>
+                                          <option value="Chi" <?php if($_SESSION['B2'] =="Chi") echo 'selected'; ?>>CHILE</option>
+                                          <option value="Aus" <?php if($_SESSION['B2'] =="Aus") echo 'selected'; ?>>AUSTRALIA</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="C">Grupo C</label>
+                                        <select id="C"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][C][]">
+                                          <option value="Col" <?php if($_SESSION['C1'] =="Col") echo 'selected'; ?>>COLOMBIA</option>
+                                          <option value="Civ" <?php if($_SESSION['C1'] =="Civ") echo 'selected'; ?>>COSTA DE MARFIL</option>
+                                          <option value="Gre" <?php if($_SESSION['C1'] =="Gre") echo 'selected'; ?>>GRECIA</option>
+                                          <option value="Jpn" <?php if($_SESSION['C1'] =="Jpn") echo 'selected'; ?>>JAPON</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][C][]">
+                                          <option value="Col" <?php if($_SESSION['C2'] =="Col") echo 'selected'; ?>>COLOMBIA</option>
+                                          <option value="Civ" <?php if($_SESSION['C2'] =="Civ") echo 'selected'; ?>>COSTA DE MARFIL</option>
+                                          <option value="Gre" <?php if($_SESSION['C2'] =="Gre") echo 'selected'; ?>>GRECIA</option>
+                                          <option value="Jpn" <?php if($_SESSION['C2'] =="Jpn") echo 'selected'; ?>>JAPON</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="D">Grupo D</label>
+                                        <select id="D"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][D][]">
+                                          <option value="Uru" <?php if($_SESSION['D1'] =="Uru") echo 'selected'; ?>>URUGUAY</option>
+                                          <option value="Ita" <?php if($_SESSION['D1'] =="Ita") echo 'selected'; ?>>ITALIA</option>
+                                          <option value="Eng" <?php if($_SESSION['D1'] =="Eng") echo 'selected'; ?>>INGLATERRA</option>
+                                          <option value="Crc" <?php if($_SESSION['D1'] =="Crc") echo 'selected'; ?>>COSTA RICA</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][D][]">
+                                          <option value="Uru" <?php if($_SESSION['D2'] =="Uru") echo 'selected'; ?>>URUGUAY</option>
+                                          <option value="Ita" <?php if($_SESSION['D2'] =="Ita") echo 'selected'; ?>>ITALIA</option>
+                                          <option value="Eng" <?php if($_SESSION['D2'] =="Eng") echo 'selected'; ?>>INGLATERRA</option>
+                                          <option value="Crc" <?php if($_SESSION['D2'] =="Crc") echo 'selected'; ?>>COSTA RICA</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="E">Grupo E</label>
+                                        <select id="E"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][E][]">
+                                          <option value="Sui" <?php if($_SESSION['E1'] =="Sui") echo 'selected'; ?>>SUIZA</option>
+                                          <option value="Fra" <?php if($_SESSION['E1'] =="Fra") echo 'selected'; ?>>FRANCIA</option>
+                                          <option value="Hon" <?php if($_SESSION['E1'] =="Hon") echo 'selected'; ?>>HONDURAS</option>
+                                          <option value="Ecu" <?php if($_SESSION['E1'] =="Ecu") echo 'selected'; ?>>ECUADOR</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][E][]">
+                                          <option value="Sui" <?php if($_SESSION['E2'] =="Sui") echo 'selected'; ?>>SUIZA</option>
+                                          <option value="Fra" <?php if($_SESSION['E2'] =="Fra") echo 'selected'; ?>>FRANCIA</option>
+                                          <option value="Hon" <?php if($_SESSION['E2'] =="Hon") echo 'selected'; ?>>HONDURAS</option>
+                                          <option value="Ecu" <?php if($_SESSION['E2'] =="Ecu") echo 'selected'; ?>>ECUADOR</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="F">Grupo F</label>
+                                        <select id="F"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][F][]">
+                                          <option value="Arg" <?php if($_SESSION['F1'] =="Arg") echo 'selected'; ?>>ARGENTINA</option>
+                                          <option value="Nga" <?php if($_SESSION['F1'] =="Nga") echo 'selected'; ?>>NIGERIA</option>
+                                          <option value="Bih" <?php if($_SESSION['F1'] =="Bih") echo 'selected'; ?>>BOSNIA/HERZ.</option>
+                                          <option value="Irn" <?php if($_SESSION['F1'] =="Irn") echo 'selected'; ?>>IRAN</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][F][]">
+                                          <option value="Arg" <?php if($_SESSION['F2'] =="Arg") echo 'selected'; ?>>ARGENTINA</option>
+                                          <option value="Nga" <?php if($_SESSION['F2'] =="Nga") echo 'selected'; ?>>NIGERIA</option>
+                                          <option value="Bih" <?php if($_SESSION['F2'] =="Bih") echo 'selected'; ?>>BOSNIA/HERZ.</option>
+                                          <option value="Irn" <?php if($_SESSION['F2'] =="Irn") echo 'selected'; ?>>IRAN</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="G">Grupo G</label>
+                                        <select id="G"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][G][]">
+                                          <option value="Ger" <?php if($_SESSION['G1'] =="Ger") echo 'selected'; ?>>ALEMANIA</option>
+                                          <option value="Por" <?php if($_SESSION['G1'] =="Por") echo 'selected'; ?>>PORTUGAL</option>
+                                          <option value="Gha" <?php if($_SESSION['G1'] =="Gha") echo 'selected'; ?>>GHANA</option>
+                                          <option value="Usa" <?php if($_SESSION['G1'] =="Usa") echo 'selected'; ?>>USA</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][G][]">
+                                          <option value="Ger" <?php if($_SESSION['G2'] =="Ger") echo 'selected'; ?>>ALEMANIA</option>
+                                          <option value="Por" <?php if($_SESSION['G2'] =="Por") echo 'selected'; ?>>PORTUGAL</option>
+                                          <option value="Gha" <?php if($_SESSION['G2'] =="Gha") echo 'selected'; ?>>GHANA</option>
+                                          <option value="Usa" <?php if($_SESSION['G2'] =="Usa") echo 'selected'; ?>>USA</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label class="teamLabel" for="H">Grupo H</label>
+                                        <select id="H"class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][H][]">
+                                          <option value="Bel" <?php if($_SESSION['H1'] =="Bel") echo 'selected'; ?>>BELGICA</option>
+                                          <option value="Rus" <?php if($_SESSION['H1'] =="Rus") echo 'selected'; ?>>RUSIA</option>
+                                          <option value="Kor" <?php if($_SESSION['H1'] =="Kor") echo 'selected'; ?>>COREA</option>
+                                          <option value="Alg" <?php if($_SESSION['H1'] =="Alg") echo 'selected'; ?>>ARGELIA</option>
+                                        </select>
+                                        <select class="group" name="bonus[<?php echo $_SESSION['UserId'] ?>][H][]">
+                                          <option value="Bel" <?php if($_SESSION['H2'] =="Bel") echo 'selected'; ?>>BELGICA</option>
+                                          <option value="Rus" <?php if($_SESSION['H2'] =="Rus") echo 'selected'; ?>>RUSIA</option>
+                                          <option value="Kor" <?php if($_SESSION['H2'] =="Kor") echo 'selected'; ?>>COREA</option>
+                                          <option value="Alg" <?php if($_SESSION['H2'] =="Alg") echo 'selected'; ?>>ARGELIA</option>
+                                        </select>
+                                    </p>
+                                    </legend>
+                                    </div>
+                                    <div type="text" name="Salvar" class="btnSave" id="btnbono" onclick="submitBonus()">Guardar</div>
+                                </fieldset>
+                            </form>
+                            <form id="formElem" name="r1f1form" class="r1f1form" action="php/savescores.php" method="post">
+                                <fieldset class="step">
+                                    <div class="scrollDiv" style="overflow-y:auto;overflow-x:hidden;height:400px;">
+                                    <legend>Ronda 1: Fecha 1 (Cierra: Junio 10, 8pm ET)</legend>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/bra.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M1A">BRASIL</label>
+                                        <input id="R1F1M1A" tabindex="-1" value="<?php echo $_SESSION['R1F1M1A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M1B" value="<?php echo $_SESSION['R1F1M1B'] ?>"type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M1B">CROACIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/cro.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/mex.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M2A">MEXICO</label>
+                                        <input id="R1F1M2A" value="<?php echo $_SESSION['R1F1M2A'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M2B" value="<?php echo $_SESSION['R1F1M2B'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M2B">CAMERUN</label>
+                                        <img src="http://img.fifa.com/images/flags/4/cmr.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/esp.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M3A">ESPAÑA</label>
+                                        <input id="R1F1M3A" value="<?php echo $_SESSION['R1F1M3A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M3B" value="<?php echo $_SESSION['R1F1M3B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M3B">HOLANDA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ned.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/chi.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M4A">CHILE</label>
+                                        <input id="R1F1M4A"  value="<?php echo $_SESSION['R1F1M4A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M4B"  value="<?php echo $_SESSION['R1F1M4B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M4B">AUSTRALIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/aus.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/col.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M5A">COLOMBIA</label>
+                                        <input id="R1F1M5A"  value="<?php echo $_SESSION['R1F1M5A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M5B"  value="<?php echo $_SESSION['R1F1M5B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M5B">GRECIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/gre.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/uru.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M6A">URUGUAY</label>
+                                        <input id="R1F1M6A"  value="<?php echo $_SESSION['R1F1M6A'] ?>" type="number" min="0"
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M6B"  value="<?php echo $_SESSION['R1F1M6B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M6B">COSTA RICA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/crc.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/eng.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M7A">INGLATERRA</label>
+                                        <input id="R1F1M7A"  value="<?php echo $_SESSION['R1F1M7A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M7B"  value="<?php echo $_SESSION['R1F1M7B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M7B">ITALIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ita.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/civ.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M8A">COSTA DE MARFIL</label>
+                                        <input id="R1F1M8A"  value="<?php echo $_SESSION['R1F1M8A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M8B"  value="<?php echo $_SESSION['R1F1M8B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M8B">JAPON</label>
+                                        <img src="http://img.fifa.com/images/flags/4/jpn.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/sui.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M9A">SUIZA</label>
+                                        <input id="R1F1M9A"  value="<?php echo $_SESSION['R1F1M9A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M9B"  value="<?php echo $_SESSION['R1F1M9B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M9B">ECUADOR</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ecu.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/fra.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M10A">FRANCIA</label>
+                                        <input id="R1F1M10A"  value="<?php echo $_SESSION['R1F1M10A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M10B"  value="<?php echo $_SESSION['R1F1M10B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M10B">HONDURAS</label>
+                                        <img src="http://img.fifa.com/images/flags/4/hon.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/arg.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M11A">ARGENTINA</label>
+                                        <input id="R1F1M11A"  value="<?php echo $_SESSION['R1F1M11A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M11B"  value="<?php echo $_SESSION['R1F1M11B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M11B">BOSNIA/HERZ.</label>
+                                        <img src="http://img.fifa.com/images/flags/4/bih.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ger.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M12A">ALEMANIA</label>
+                                        <input id="R1F1M12A"  value="<?php echo $_SESSION['R1F1M12A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M12B"  value="<?php echo $_SESSION['R1F1M12B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M12B">PORTUGAL</label>
+                                        <img src="http://img.fifa.com/images/flags/4/por.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/irn.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M13A">IRAN</label>
+                                        <input id="R1F1M13A"  value="<?php echo $_SESSION['R1F1M13A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M13B"  value="<?php echo $_SESSION['R1F1M13B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M13B">NIGERIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/nga.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/gha.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M14A">GHANA</label>
+                                        <input id="R1F1M14A" value="<?php echo $_SESSION['R1F1M14A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M14B"  value="<?php echo $_SESSION['R1F1M14B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M14B">USA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/usa.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/bel.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M15A">BELGICA</label>
+                                        <input id="R1F1M15A"  value="<?php echo $_SESSION['R1F1M15A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M15B"  value="<?php echo $_SESSION['R1F1M15B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M15B">ARGELIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/alg.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/rus.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M16A">RUSIA</label>
+                                        <input id="R1F1M16A" value="<?php echo $_SESSION['R1F1M16A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M16B"  value="<?php echo $_SESSION['R1F1M16B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M16R">COREA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/kor.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/bra.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F1M17A">BRASIL</label>
+                                        <input id="R1F1M17A"  value="<?php echo $_SESSION['R1F1M17A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F1M17B"  value="<?php echo $_SESSION['R1F1M17B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F1][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F1M17B">MEXICO</label>
+                                        <img src="http://img.fifa.com/images/flags/4/mex.png" alt="" class="flags">
+                                    </p>
+                                    </div>
+                                    <div type="text" name="Salvar" class="btnSave" id="btnr1f1" onclick="submitForm('.r1f1form')">Guardar</div>
+                                </fieldset>
+                            </form>
+                            <form id="formElem" name="r1f2form" class="r1f2form" action="php/savescores.php" method="post">
+                                <fieldset class="step">
+                                    <div class="scrollDiv" style="overflow-y:auto;overflow-x:hidden;height:400px;">
+                                    <legend>Ronda 1: Fecha 2  (Cierra: Junio 17, 8pm ET)</legend>
+                                     <p>
+                                        <img src="http://img.fifa.com/images/flags/4/aus.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M1A">AUSTRALIA</label>
+                                        <input id="R1F2M1A" value="<?php echo $_SESSION['R1F2M1A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M1B" value="<?php echo $_SESSION['R1F2M1B'] ?>"type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M1B">HOLANDA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ned.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/esp.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M2A">ESPAÑA</label>
+                                        <input id="R1F2M2A" value="<?php echo $_SESSION['R1F2M2A'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M2B" value="<?php echo $_SESSION['R1F2M2B'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M2B">CHILE</label>
+                                        <img src="http://img.fifa.com/images/flags/4/chi.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/cmr.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M3A">CAMERUN</label>
+                                        <input id="R1F2M3A" value="<?php echo $_SESSION['R1F2M3A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M3B" value="<?php echo $_SESSION['R1F2M3B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M3B">CROACIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/cro.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/col.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M4A">COLOMBIA</label>
+                                        <input id="R1F2M4A"  value="<?php echo $_SESSION['R1F2M4A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M4B"  value="<?php echo $_SESSION['R1F2M4B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M4B">COSTA DE MARFIL</label>
+                                        <img src="http://img.fifa.com/images/flags/4/civ.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/uru.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M5A">URUGUAY</label>
+                                        <input id="R1F2M5A"  value="<?php echo $_SESSION['R1F2M5A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M5B"  value="<?php echo $_SESSION['R1F2M5B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M5B">INGLATERRA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/eng.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/jpn.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M6A">JAPON</label>
+                                        <input id="R1F2M6A"  value="<?php echo $_SESSION['R1F2M6A'] ?>" type="number" min="0"
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M6B"  value="<?php echo $_SESSION['R1F2M6B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M6B">GRECIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/gre.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ita.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M7A">ITALIA</label>
+                                        <input id="R1F2M7A"  value="<?php echo $_SESSION['R1F2M7A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M7B"  value="<?php echo $_SESSION['R1F2M7B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M7B">COSTA RICA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/crc.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/sui.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M8A">SUIZA</label>
+                                        <input id="R1F2M8A"  value="<?php echo $_SESSION['R1F2M8A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M8B"  value="<?php echo $_SESSION['R1F2M8B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M8B">FRANCIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/fra.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/hon.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M9A">HONDURAS</label>
+                                        <input id="R1F2M9A"  value="<?php echo $_SESSION['R1F2M9A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M9B"  value="<?php echo $_SESSION['R1F2M9B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M9B">ECUADOR</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ecu.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/arg.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M10A">ARGENTINA</label>
+                                        <input id="R1F2M10A"  value="<?php echo $_SESSION['R1F2M10A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M10B"  value="<?php echo $_SESSION['R1F2M10B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M10B">IRAN</label>
+                                        <img src="http://img.fifa.com/images/flags/4/irn.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ger.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M11A">ALEMANIA</label>
+                                        <input id="R1F2M11A"  value="<?php echo $_SESSION['R1F2M11A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M11B"  value="<?php echo $_SESSION['R1F2M11B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M11B">GHANA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/gha.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/nga.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M12A">NIGERIA</label>
+                                        <input id="R1F2M12A"  value="<?php echo $_SESSION['R1F2M12A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M12B"  value="<?php echo $_SESSION['R1F2M12B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M12B">BOSNIA/HERZ.</label>
+                                        <img src="http://img.fifa.com/images/flags/4/bih.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/bel.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M13A">BELGICA</label>
+                                        <input id="R1F2M13A"  value="<?php echo $_SESSION['R1F2M13A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M13B"  value="<?php echo $_SESSION['R1F2M13B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M13B">RUSIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/rus.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/kor.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M14A">COREA</label>
+                                        <input id="R1F2M14A" value="<?php echo $_SESSION['R1F2M14A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M14B"  value="<?php echo $_SESSION['R1F2M14B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M14B">ARGELIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/alg.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/usa.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F2M15A">USA</label>
+                                        <input id="R1F2M15A"  value="<?php echo $_SESSION['R1F2M15A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F2M15B"  value="<?php echo $_SESSION['R1F2M15B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F2][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F2M15B">PORTUGAL</label>
+                                        <img src="http://img.fifa.com/images/flags/4/por.png" alt="" class="flags">
+                                    </p>
+                                    </div>
+                                    <div type="text" name="Salvar" class="btnSave" id="btnr1f2" onclick="submitForm('.r1f2form')">Guardar</div>
+                                </fieldset>
+                            </form>
+                            <form id="formElem" name="r1f3form" class="r1f3form" action="php/savescores.php" method="post">
+                                <fieldset class="step">
+                                    <div class="scrollDiv" style="overflow-y:auto;overflow-x:hidden;height:400px;">
+                                    <legend>Ronda 1: Fecha 3  (Cierra: Junio 22, 8pm ET)</legend>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/aus.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M1A">AUSTRALIA</label>
+                                        <input id="R1F3M1A" value="<?php echo $_SESSION['R1F3M1A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M1B" value="<?php echo $_SESSION['R1F3M1B'] ?>"type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M1B">ESPAÑA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/esp.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ned.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M2A">HOLANDA</label>
+                                        <input id="R1F3M2A" value="<?php echo $_SESSION['R1F3M2A'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M2B" value="<?php echo $_SESSION['R1F3M2B'] ?>"type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M2B">CHILE</label>
+                                        <img src="http://img.fifa.com/images/flags/4/chi.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/cro.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M3A">CROACIA</label>
+                                        <input id="R1F3M3A" value="<?php echo $_SESSION['R1F3M3A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M3B" value="<?php echo $_SESSION['R1F3M3B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M3B">MEXICO</label>
+                                        <img src="http://img.fifa.com/images/flags/4/mex.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/cmr.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M4A">CAMERUN</label>
+                                        <input id="R1F3M4A"  value="<?php echo $_SESSION['R1F3M4A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M4B"  value="<?php echo $_SESSION['R1F3M4B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M4B">BRASIL</label>
+                                        <img src="http://img.fifa.com/images/flags/4/bra.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/crc.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M5A">COSTA RICA</label>
+                                        <input id="R1F3M5A"  value="<?php echo $_SESSION['R1F3M5A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M5B"  value="<?php echo $_SESSION['R1F3M5B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M5B">INGLATERRA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/eng.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ita.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M6A">ITALIA</label>
+                                        <input id="R1F3M6A"  value="<?php echo $_SESSION['R1F3M6A'] ?>" type="number" min="0"
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M6B"  value="<?php echo $_SESSION['R1F3M6B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M6B">URUGUAY</label>
+                                        <img src="http://img.fifa.com/images/flags/4/uru.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/jpn.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M7A">JAPON</label>
+                                        <input id="R1F3M7A"  value="<?php echo $_SESSION['R1F3M7A'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M7B"  value="<?php echo $_SESSION['R1F3M7B'] ?>" type="number" min="0" 
+                                        name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M7B">COLOMBIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/col.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/gre.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M8A">GRECIA</label>
+                                        <input id="R1F3M8A"  value="<?php echo $_SESSION['R1F3M8A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M8B"  value="<?php echo $_SESSION['R1F3M8B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M8B">COSTA DE MARFIL</label>
+                                        <img src="http://img.fifa.com/images/flags/4/civ.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/nga.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M9A">NIGERIA</label>
+                                        <input id="R1F3M9A"  value="<?php echo $_SESSION['R1F3M9A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M9B"  value="<?php echo $_SESSION['R1F3M9B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M9B">ARGENTINA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/arg.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/bih.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M10A">BOSNIA/HERZ.</label>
+                                        <input id="R1F3M10A"  value="<?php echo $_SESSION['R1F3M10A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M10B"  value="<?php echo $_SESSION['R1F3M10B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M10B">IRAN</label>
+                                        <img src="http://img.fifa.com/images/flags/4/irn.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/hon.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M11A">HONDURAS</label>
+                                        <input id="R1F3M11A"  value="<?php echo $_SESSION['R1F3M11A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M11B"  value="<?php echo $_SESSION['R1F3M11B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M11B">SUIZA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/sui.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/ecu.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M12A">ECUADOR</label>
+                                        <input id="R1F3M12A"  value="<?php echo $_SESSION['R1F3M12A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M12B"  value="<?php echo $_SESSION['R1F3M12B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M12B">FRANCIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/fra.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/por.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M13A">PORTUGAL</label>
+                                        <input id="R1F3M13A"  value="<?php echo $_SESSION['R1F3M13A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M13B"  value="<?php echo $_SESSION['R1F3M13B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M13B">GHANA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/gha.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/usa.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M14A">USA</label>
+                                        <input id="R1F3M14A" value="<?php echo $_SESSION['R1F3M14A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M14B"  value="<?php echo $_SESSION['R1F3M14B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M14B">ALEMANIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/ger.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/kor.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M15A">COREA</label>
+                                        <input id="R1F3M15A"  value="<?php echo $_SESSION['R1F3M15A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M15B"  value="<?php echo $_SESSION['R1F3M15B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M15B">BELGICA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/bel.png" alt="" class="flags">
+                                    </p>
+                                    <p>
+                                        <img src="http://img.fifa.com/images/flags/4/alg.png" alt="" class="flags">
+                                        <label class="teamLabel" for="R1F3M16A">ARGELIA</label>
+                                        <input id="R1F3M16A" value="<?php echo $_SESSION['R1F3M16A'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <input id="R1F3M16B"  value="<?php echo $_SESSION['R1F3M16B'] ?>" type="number" min="0"
+                                         name="score[<?php echo $_SESSION['UserId'] ?>][R1F3][]" onkeypress="return isNumberKey(event)"/>
+                                        <label class="teamLabel" for="R1F3M16R">RUSIA</label>
+                                        <img src="http://img.fifa.com/images/flags/4/rus.png" alt="" class="flags">
+                                    </p>
+                                    </div>
+                                    <div type="text" name="Salvar" class="btnSave" id="btnr1f3" onclick="submitForm('.r1f3form')">Guardar</div>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <div id="navigation" style="display:none;">
+                            <ul>
+                                <li  class="selected">
+                                    <a href="#">Bono</a>
+                                </li>
+                                <li>
+                                    <a href="#">Ronda 1: Fecha 1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Ronda 1: Fecha 2</a>
+                                </li>
+                                <li>
+                                    <a href="#">Ronda 1: Fecha 3</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            <!--TABS-->
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <?php
+        endif;
+    ?>
+
+    <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>GranPolla Mundial 2014</h2>
+                <p>granpollamundial2014@outlook.com</p>
+                <ul class="list-inline banner-social-buttons">
+                    <li><a href="https://www.facebook.com/granpolla.mundial" class="btn btn-default btn-lg"><i class="fa fa-facebook fa-fw"></i> <span class="network-name">Facebook</span></a>
+                    </li>
+                    <li><a href="https://www.twitter.com/GranPolla2014" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                    </li>
+                    <li><a href="mailto:granpollamundial2014@outlook.com" class="btn btn-default btn-lg"><i class="fa fa-envelope fa-fw"></i> <span class="network-name">Email</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div id="map"></div>
+    <div class="dialogForm" >
+        <form action="php/signup.php" method="post" class="signupForm">
+            <p class="validateTips">Todos los campos son obligatorios</p>
+            <fieldset>
+                <label for="firstname">Nombre</label><br>
+                <input type="text" name="firstname" id="firstname" value="" class="text ui-widget-content ui-corner-all"><br><br>
+                <label for="lastname">Apellido</label><br>
+                <input type="text" name="lastname" id="lastname" value="" class="text ui-widget-content ui-corner-all"><br><br>
+                <label for="email">E-mail</label><br>
+                <input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all"><br><br>
+                <label for="pass">Password</label><br>
+                <input type="password" name="pass" id="password" value="" class="text ui-widget-content ui-corner-all">
+            </fieldset>        
+        </form>
+    </div>
+    <div id="footer">
+        Diseño y Desarollo - Pablo Lleras
+    </div>
+    <script type="text/javascript">
+    validateDate();
+    </script>
+
+    <!-- Google Maps API Key - You will need to use your own API key to use the map feature -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/grayscale.js"></script>
+    <script type="text/javascript" src="js/sliding.form.js"></script>
+
+</body>
+
+</html>
